@@ -4,6 +4,20 @@ This document outlines the architectural decisions, system design, database sche
 
 ---
 
+## Table of Contents
+* [1. Directory Structure & Code Organization](#1-directory-structure--code-organization)
+* [2. High-Level Architecture (HLD)](#2-high-level-architecture-hld)
+* [3. Low-Level Design (LLD) & Data Flow](#3-low-level-design-lld--data-flow)
+* [4. Tech Stack & Justification](#4-tech-stack--justification)
+* [5. Data Warehouse & Database Schema (DuckDB)](#5-data-warehouse--database-schema-duckdb)
+* [6. Machine Learning & Predictive Pipelines](#6-machine-learning--predictive-pipelines)
+* [7. Frontend State & Caching Architecture](#7-frontend-state--caching-architecture)
+* [8. API Reference](#8-api-reference)
+* [9. Features & Visualizations Mapping](#9-features--visualizations-mapping)
+* [10. N-File In-Memory Correlation Data Flow](#10-n-file-in-memory-correlation-data-flow)
+
+---
+
 ## 1. Directory Structure & Code Organization
 
 ```
@@ -101,13 +115,13 @@ sequenceDiagram
 
 | Component | Technology | Justification |
 | :--- | :--- | :--- |
-| **Frontend Framework** | React 18 + Vite + TS | High performance, strict typing, and instant HMR via Vite. |
-| **State Management** | Zustand | Lightweight and boilerplate-free compared to Redux; perfect for simple global filter states. |
-| **Data Fetching** | TanStack Query | Built-in caching, background re-fetching, and loading state management. |
-| **Charting** | ECharts (echarts-for-react) | High-performance canvas-based rendering capable of handling thousands of data points smoothly. |
-| **Backend Framework** | FastAPI (Python) | Extremely fast, built-in validation via Pydantic, and automatic Swagger docs. |
-| **Database** | DuckDB | Embeddable OLAP database. Provides sub-second aggregations over millions of rows without a dedicated server. |
-| **Machine Learning** | Prophet | Robust time-series forecasting that handles missing data and large outliers well, explicitly built for retail/business forecasting. |
++| **Frontend Framework** | React 18 + Vite + TS | High performance, strict typing, and instant HMR via Vite. |
++| **State Management** | Zustand | Lightweight and boilerplate-free compared to Redux; perfect for simple global filter states. |
++| **Data Fetching** | TanStack Query | Built-in caching, background re-fetching, and loading state management. |
++| **Charting** | ECharts (echarts-for-react) | High-performance canvas-based rendering capable of handling thousands of data points smoothly. |
++| **Backend Framework** | FastAPI (Python) | Extremely fast, built-in validation via Pydantic, and automatic Swagger docs. |
++| **Database** | DuckDB | Embeddable OLAP database. Provides sub-second aggregations over millions of rows without a dedicated server. |
++| **Machine Learning** | Prophet | Robust time-series forecasting that handles missing data and large outliers well, explicitly built for retail/business forecasting. |
 
 ---
 
