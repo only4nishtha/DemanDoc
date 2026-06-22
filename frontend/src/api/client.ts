@@ -62,3 +62,11 @@ export async function fetchGeo(params: Record<string, string>) {
   if (!res.ok) throw new Error('Failed to fetch geo');
   return res.json();
 }
+
+export async function fetchDatasetPreview(params: Record<string, string>) {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/dataset-preview?${query}`);
+  if (!res.ok) throw new Error('Failed to fetch dataset preview');
+  return res.json();
+}
+

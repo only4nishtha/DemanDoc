@@ -99,7 +99,7 @@ export default function CategoryTreemap() {
 
   return (
     <div className="flex flex-col space-y-4">
-      <ReactECharts option={option} style={{ height: "200px" }} theme="dark" />
+      <ReactECharts option={option} style={{ height: "160px" }} theme="dark" />
       <div className="bg-[#1E2432]/40 p-4 rounded-xl border border-[#252B38] space-y-3.5">
         <div>
           <h4 className="text-[10px] font-bold text-[#2DD4BF] uppercase tracking-wider mb-0.5">

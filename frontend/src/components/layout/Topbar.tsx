@@ -10,7 +10,8 @@ export default function Topbar() {
     setGranularity,
     dateFrom,
     dateTo,
-    setDateRange
+    setDateRange,
+    setIsPrinting,
   } = useStore();
 
   return (
@@ -94,6 +95,17 @@ export default function Topbar() {
             onChange={(e) => setDateRange(dateFrom, e.target.value)}
             className="bg-[#1D2432] border border-[#374151] rounded px-2 py-0.5 text-white focus:outline-none focus:border-[#2DD4BF]"
           />
+        </div>
+
+        {/* PDF Export Button */}
+        <div className="flex flex-col justify-end pt-3">
+          <button
+            onClick={() => setIsPrinting(true)}
+            className="bg-[#1E2638] text-[#2DD4BF] border border-[#2DD4BF]/20 hover:bg-[#2DD4BF] hover:text-black transition-all rounded px-3 py-1 font-semibold text-xs whitespace-nowrap active:scale-95 shadow-md"
+            id="btn-pdf-export"
+          >
+            Export PDF Report
+          </button>
         </div>
       </div>
     </div>

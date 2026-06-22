@@ -1,13 +1,35 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useStore } from "../../store/useStore";
 import type { View } from "../../store/useStore";
 
 export default function Sidebar() {
-  const { activeView, setActiveView } = useStore();
+  const { 
+    activeView, 
+    setActiveView, 
+    uploadedFilename, 
+    setUploadedFilename, 
+    uploadedFilenames, 
+    setUploadedFilenames 
+  } = useStore();
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load existing datasets on mount
+  useEffect(() => {
+    fetch("http://localhost:8000/api/custom/list-files")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.files) {
+          setUploadedFilenames(data.files);
+          if (data.files.length > 0 && !uploadedFilename) {
+            setUploadedFilename(data.files[0]);
+          }
+        }
+      })
+      .catch((err) => console.error("Error listing files:", err));
+  }, []);
 
   const menuItems: { name: View; label: string }[] = [
     { name: "Overview", label: "Overview" },
@@ -18,6 +40,10 @@ export default function Sidebar() {
     { name: "Geographic", label: "Geographic" },
   ];
 
+  if (uploadedFilenames.length > 0) {
+    menuItems.push({ name: "Custom Analysis", label: "Custom Analysis" });
+  }
+
   const handleNavigate = (view: View) => {
     setActiveView(view);
     const targetElement = document.getElementById(`panel-${view.toLowerCase().replace(" ", "-")}`);
@@ -27,52 +53,54 @@ export default function Sidebar() {
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.name.endsWith('.csv')) {
-      setUploadStatus("Error: Only CSV files are supported.");
-      return;
-    }
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setUploading(true);
-    setUploadStatus("Uploading dataset...");
-    setProgress(10);
+    setUploadStatus("Starting uploads...");
+    setProgress(0);
 
-    const formData = new FormData();
-    formData.append("file", file);
+    const uploadedList: string[] = [...uploadedFilenames];
+    let successCount = 0;
 
-    try {
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "http://localhost:8000/api/upload-dataset", true);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.name.endsWith('.csv')) {
+        setUploadStatus(`Error: Only CSV files are supported.`);
+        continue;
+      }
 
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round((event.loaded / event.total) * 100);
-          setProgress(percentComplete);
+      setUploadStatus(`Uploading ${file.name} (${i + 1}/${files.length})...`);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("http://localhost:8000/api/upload-dataset", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          successCount++;
+          if (!uploadedList.includes(file.name)) {
+            uploadedList.push(file.name);
+          }
         }
-      };
+      } catch (err) {
+        console.error(`Upload error for ${file.name}`, err);
+      }
 
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          setUploadStatus("Successfully ingested");
-          setProgress(100);
-        } else {
-          setUploadStatus("Upload failed");
-        }
-        setUploading(false);
-      };
-
-      xhr.onerror = () => {
-        setUploadStatus("Upload error occurred");
-        setUploading(false);
-      };
-
-      xhr.send(formData);
-    } catch (err) {
-      setUploadStatus("Failed to submit dataset");
-      setUploading(false);
+      setProgress(Math.round(((i + 1) / files.length) * 100));
     }
+
+    setUploadedFilenames(uploadedList);
+    if (uploadedList.length > 0) {
+      setUploadedFilename(uploadedList[uploadedList.length - 1]);
+      setActiveView("Custom Analysis");
+    }
+
+    setUploadStatus(`Uploaded ${successCount} of ${files.length} files`);
+    setUploading(false);
   };
 
   return (
@@ -123,6 +151,48 @@ export default function Sidebar() {
         })}
       </nav>
 
+      {/* Uploaded Files List */}
+      {uploadedFilenames.length > 0 && (
+        <div className="px-4 py-2 border-t border-[#252B38] space-y-1.5 max-h-40 overflow-y-auto">
+          <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider block">
+            Uploaded Files
+          </span>
+          <div className="space-y-1">
+            {uploadedFilenames.map((f) => (
+              <div 
+                key={f} 
+                className={`flex items-center justify-between text-xs px-2 py-1 rounded border transition-colors truncate cursor-pointer ${
+                  uploadedFilename === f 
+                    ? "bg-[#2DD4BF]/10 text-[#2DD4BF] border-[#2DD4BF]/30" 
+                    : "bg-[#1D2432]/20 text-gray-400 border-[#252B38] hover:border-gray-700"
+                }`}
+                onClick={() => {
+                  setUploadedFilename(f);
+                  setActiveView("Custom Analysis");
+                }}
+              >
+                <span className="truncate flex-1 pr-1 font-mono text-[10px]" title={f}>
+                  {f}
+                </span>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const updated = uploadedFilenames.filter(name => name !== f);
+                    setUploadedFilenames(updated);
+                    if (uploadedFilename === f) {
+                      setUploadedFilename(updated[0] || null);
+                    }
+                  }}
+                  className="text-gray-500 hover:text-red-400 text-[11px] ml-1 px-1 font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Dataset Ingestion Column */}
       <div className="mt-auto p-4 border-t border-[#252B38] space-y-3">
         <div>
@@ -130,7 +200,7 @@ export default function Sidebar() {
             Data Ingestion
           </h3>
           <p className="text-[10px] text-gray-500 leading-normal mb-2">
-            Upload custom CSV dataset to analyze (Max size: 2.5GB).
+            Upload custom CSV dataset to analyze.
           </p>
         </div>
 
@@ -144,9 +214,10 @@ export default function Sidebar() {
             onChange={handleFileChange}
             className="hidden"
             accept=".csv"
+            multiple
           />
           <span className="text-xs text-gray-400 block font-medium">
-            {uploading ? "Uploading..." : "Select CSV File"}
+            {uploading ? "Uploading..." : "Select CSV File(s)"}
           </span>
           <span className="text-[9px] text-gray-600 block mt-1">
             Drag & drop or browse
@@ -169,12 +240,6 @@ export default function Sidebar() {
             )}
           </div>
         )}
-      </div>
-
-      {/* Footer Info */}
-      <div className="p-4 border-t border-[#252B38] text-[10px] text-gray-500 space-y-0.5">
-        <p>Database: DuckDB Warehouse</p>
-        <p>Engine: Prophet Forecasting</p>
       </div>
     </div>
   );

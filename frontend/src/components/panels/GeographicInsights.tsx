@@ -73,37 +73,66 @@ export default function GeographicInsights() {
     tooltip: {
       trigger: "axis",
       axisPointer: { type: "shadow" },
-      formatter: "{b}: ${c}",
+      formatter: (params: any[]) => {
+        const item = params[0];
+        return `${item.name}<br/>Revenue: $${Number(item.value).toLocaleString()}`;
+      },
       backgroundColor: "#1F2937",
       borderWidth: 0,
       textStyle: { color: "#fff" },
     },
     grid: {
       left: "3%",
-      right: "4%",
-      bottom: "3%",
+      right: "6%",
+      bottom: "22%",
       top: "5%",
       containLabel: true,
     },
     xAxis: {
       type: "value",
       axisLine: { lineStyle: { color: "#374151" } },
-      axisLabel: { color: "#9CA3AF" },
+      axisLabel: {
+        color: "#9CA3AF",
+        fontSize: 10,
+        rotate: 30,
+        formatter: (v: number) => {
+          if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+          if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}K`;
+          return `$${v}`;
+        },
+      },
       splitLine: { lineStyle: { color: "#1F2937" } },
     },
     yAxis: {
       type: "category",
       data: states,
       axisLine: { lineStyle: { color: "#374151" } },
-      axisLabel: { color: "#9CA3AF" },
+      axisLabel: {
+        color: "#9CA3AF",
+        fontSize: 11,
+        width: 140,
+        overflow: "truncate",
+      },
     },
     series: [
       {
         name: "Revenue by State",
         type: "bar",
         data: revenues,
-        itemStyle: { color: "#2DD4BF" },
+        itemStyle: { color: "#2DD4BF", borderRadius: [0, 4, 4, 0] },
         barWidth: "40%",
+        label: {
+          show: true,
+          position: "right",
+          color: "#9CA3AF",
+          fontSize: 10,
+          formatter: (p: any) => {
+            const v = p.value;
+            if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+            if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}K`;
+            return `$${v}`;
+          },
+        },
       },
     ],
   };
@@ -111,7 +140,7 @@ export default function GeographicInsights() {
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 xl:col-span-8">
-        <ReactECharts option={option} style={{ height: "300px" }} theme="dark" />
+        <ReactECharts option={option} style={{ height: "320px" }} theme="dark" />
       </div>
       <div className="col-span-12 xl:col-span-4 flex flex-col justify-center space-y-4 bg-[#1E2432]/40 p-4 rounded-xl border border-[#252B38] h-fit">
         <div>

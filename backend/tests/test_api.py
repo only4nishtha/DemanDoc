@@ -140,3 +140,13 @@ def test_upload_dataset(client):
     assert response.status_code == 200
     assert "Successfully ingested" in response.json()["message"]
 
+def test_dataset_preview(client):
+    response = client.get("/api/dataset-preview?filename=test_upload.csv")
+    assert response.status_code == 200
+    data = response.json()
+    assert "filename" in data
+    assert "row_count" in data
+    assert "columns_summary" in data
+    assert "preview_rows" in data
+
+

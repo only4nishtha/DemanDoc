@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type Granularity = 'daily' | 'weekly' | 'monthly' | 'annual';
-export type View = 'Overview' | 'Demand Forecast' | 'Promotions' | 'Root Cause' | 'Scenario Simulator' | 'Geographic';
+export type View = 'Overview' | 'Demand Forecast' | 'Promotions' | 'Root Cause' | 'Scenario Simulator' | 'Geographic' | 'Custom Analysis';
 
 interface AppState {
   dateFrom: string;
@@ -11,6 +11,9 @@ interface AppState {
   granularity: Granularity;
   activeView: View;
   selectedDate: string | null;
+  uploadedFilename: string | null;
+  uploadedFilenames: string[];
+  isPrinting: boolean;
   
   setDateRange: (from: string, to: string) => void;
   setCategory: (cat: string) => void;
@@ -18,6 +21,9 @@ interface AppState {
   setGranularity: (granularity: Granularity) => void;
   setActiveView: (view: View) => void;
   setSelectedDate: (date: string | null) => void;
+  setUploadedFilename: (filename: string | null) => void;
+  setUploadedFilenames: (filenames: string[]) => void;
+  setIsPrinting: (v: boolean) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -28,6 +34,9 @@ export const useStore = create<AppState>((set) => ({
   granularity: 'monthly',
   activeView: 'Overview',
   selectedDate: null,
+  uploadedFilename: null,
+  uploadedFilenames: [],
+  isPrinting: false,
 
   setDateRange: (from, to) => set({ dateFrom: from, dateTo: to }),
   setCategory: (cat) => set({ category: cat }),
@@ -35,4 +44,7 @@ export const useStore = create<AppState>((set) => ({
   setGranularity: (g) => set({ granularity: g }),
   setActiveView: (v) => set({ activeView: v }),
   setSelectedDate: (d) => set({ selectedDate: d }),
+  setUploadedFilename: (f) => set({ uploadedFilename: f }),
+  setUploadedFilenames: (fs) => set({ uploadedFilenames: fs }),
+  setIsPrinting: (v) => set({ isPrinting: v }),
 }));

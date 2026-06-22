@@ -2,3 +2,36 @@
 @theme {
   --color-brand-500: #2DD4BF;
 }
+
+@media print {
+  /* ─── Hide the entire live SPA shell ─── */
+  body > #root {
+    display: none !important;
+  }
+
+  /* ─── Reveal only the PDF report overlay ─── */
+  #pdf-report-root {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    width: 100% !important;
+    height: auto !important;
+    z-index: auto !important;
+  }
+
+  /* ─── Force white paper background ─── */
+  html, body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ─── Page setup ─── */
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+}
