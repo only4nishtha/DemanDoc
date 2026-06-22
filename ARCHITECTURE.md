@@ -58,20 +58,6 @@ DemandDoc is built on a decoupled, asynchronous multi-tier architecture designed
 
 ```mermaid
 graph TD
-    Client[React SPA / TypeScript] -->|REST API / JSON| API[FastAPI Server / Uvicorn]
-    API <-->|Vectorized SQL| DuckDB[(DuckDB Columnar Store)]
-    API <-->|Prophet Fitting & Cache| ML[Prophet Forecast Engine]
-    Pipeline[ETL pipeline / prepare_data.py] -->|Compress & Aggregate| DuckDB
-    RawCSVs[(Raw Kaggle M5 CSVs)] -->|Read & Melt| Pipeline
-```
-
-
-## 1. High-Level Design (HLD)
-
-The system follows a modern decoupled architecture where a React frontend communicates with a Python/FastAPI backend, which in turn queries a heavily optimized DuckDB analytical database and invokes Prophet for ML forecasting.
-
-```mermaid
-graph TD
     Client[Browser / React SPA]
     API[FastAPI Backend]
     DB[(DuckDB Local Analytical Store)]
@@ -88,7 +74,7 @@ graph TD
 
 ---
 
-## 2. Low-Level Design (LLD) & Data Flow
+## 3. Low-Level Design (LLD) & Data Flow
 
 When a user changes a filter (e.g., Granularity from Monthly to Weekly), the data flows as follows:
 
@@ -111,7 +97,7 @@ sequenceDiagram
 
 ---
 
-## 3. Tech Stack & Justification
+## 4. Tech Stack & Justification
 
 | Component | Technology | Justification |
 | :--- | :--- | :--- |
@@ -125,7 +111,7 @@ sequenceDiagram
 
 ---
 
-## 4. Data Warehouse & Database Schema (DuckDB)
+## 5. Data Warehouse & Database Schema (DuckDB)
 
 DuckDB is utilized as an in-process columnar database. The raw M5 transactional files contain daily sales quantities for items across multiple stores in a wide pivot layout. The ETL pipeline (`prepare_data.py`) unpivots this data into a highly compressed columnar layout.
 
@@ -165,7 +151,7 @@ To ensure dashboard queries settle in under 100ms, the pipeline materializes the
 
 ---
 
-## 5. Machine Learning & Predictive Pipelines
+## 6. Machine Learning & Predictive Pipelines
 
 ### A. Optimization & Data Pre-Processing
 
@@ -197,7 +183,7 @@ $$\epsilon_p = \frac{\% \Delta Q}{\% \Delta P}$$
 
 ---
 
-## 5. Frontend State & Caching Architecture
+## 7. Frontend State & Caching Architecture
 
 ### A. Zustand Store Properties
 * `dateFrom` / `dateTo`: Bound values for date-range queries.
@@ -217,7 +203,7 @@ This guarantees that whenever a user modifies any filter, React Query automatica
 
 ---
 
-## 6. API Reference
+## 8. API Reference
 
 ### `GET /api/sales/kpis`
 - **Description**: Retrieves top-level metrics (Revenue, Units Sold, Unique Items).
@@ -252,7 +238,7 @@ This guarantees that whenever a user modifies any filter, React Query automatica
 
 ---
 
-## 7. Features & Visualizations Mapping
+## 9. Features & Visualizations Mapping
 
 | Feature | Visual Component | Data Source API | Backend Processing / ML |
 | :--- | :--- | :--- | :--- |
@@ -268,7 +254,7 @@ This guarantees that whenever a user modifies any filter, React Query automatica
 
 ---
 
-## 8. N-File In-Memory Correlation Data Flow
+## 10. N-File In-Memory Correlation Data Flow
 
 When multiple custom CSV files are uploaded, they are joined sequentially in-memory via DuckDB.
 
