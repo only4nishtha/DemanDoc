@@ -38,11 +38,20 @@ export default function CategoryTreemap() {
   }
 
   const rawList: CategoryMix[] = response.categories || [];
-  const chartData = rawList.map((item) => {
+  
+  // High contrast professional palette
+  const colors = ["#2DD4BF", "#3B82F6", "#06B6D4"];
+  
+  const chartData = rawList.map((item, index) => {
     const sign = item.revenue_growth_pct >= 0 ? "+" : "";
     return {
       name: `${item.category}\n(${sign}${item.revenue_growth_pct.toFixed(1)}%)`,
       value: item.revenue,
+      itemStyle: {
+        color: colors[index % colors.length],
+        borderColor: "#151922",
+        borderWidth: 2,
+      }
     };
   });
 
@@ -77,23 +86,12 @@ export default function CategoryTreemap() {
         type: "treemap",
         data: chartData,
         leafDepth: 1,
-        levels: [
-          {
-            itemStyle: {
-              borderColor: "#151922",
-              borderWidth: 2,
-              gapWidth: 2,
-            },
-          },
-          {
-            color: ["#2DD4BF", "#06B6D4", "#3B82F6"],
-            colorMappingBy: "value",
-          },
-        ],
         label: {
           show: true,
           formatter: "{b}",
           fontSize: 11,
+          color: "#000", // Dark text on light background blocks for maximum contrast
+          fontWeight: "bold"
         },
       },
     ],
@@ -105,13 +103,13 @@ export default function CategoryTreemap() {
       <div className="bg-[#1E2432]/40 p-4 rounded-xl border border-[#252B38] space-y-3.5">
         <div>
           <h4 className="text-[10px] font-bold text-[#2DD4BF] uppercase tracking-wider mb-0.5">
-            📊 Category Trend
+            Category Trend
           </h4>
           <p className="text-[11px] text-gray-300 leading-normal">{trendText}</p>
         </div>
         <div className="border-t border-[#252B38] pt-2">
           <h4 className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-0.5">
-            ⚠️ Product Concern
+            Product Concern
           </h4>
           <p className="text-[11px] text-gray-300 leading-normal">{concernText}</p>
         </div>

@@ -63,13 +63,13 @@ export default function RootCause() {
       <div className="col-span-12 xl:col-span-4 flex flex-col justify-center space-y-4 bg-[#1E2432]/40 p-4 rounded-xl border border-[#252B38] h-fit">
         <div>
           <h4 className="text-[10px] font-bold text-[#EF4444] uppercase tracking-wider mb-1">
-            🔍 Variance Trend
+            Variance Trend
           </h4>
           <p className="text-xs text-gray-300 leading-relaxed">{trendText}</p>
         </div>
         <div className="border-t border-[#252B38] pt-3">
           <h4 className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">
-            ⚠️ Stockout Concern
+            Stockout Concern
           </h4>
           <p className="text-xs text-gray-300 leading-relaxed">{concernText}</p>
         </div>

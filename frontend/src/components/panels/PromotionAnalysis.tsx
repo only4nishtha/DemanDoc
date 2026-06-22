@@ -118,13 +118,13 @@ export default function PromotionAnalysis() {
       <div className="col-span-12 xl:col-span-3 flex flex-col justify-center space-y-4 bg-[#1E2432]/40 p-4 rounded-xl border border-[#252B38] h-fit">
         <div>
           <h4 className="text-[10px] font-bold text-[#2DD4BF] uppercase tracking-wider mb-1">
-            🏷️ Promotional Impact
+            Promotional Impact
           </h4>
           <p className="text-xs text-gray-300 leading-relaxed">{promoTrend}</p>
         </div>
         <div className="border-t border-[#252B38] pt-3">
           <h4 className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">
-            ⚠️ Cannibalization Risk
+            Cannibalization Risk
           </h4>
           <p className="text-xs text-gray-300 leading-relaxed">{promoConcern}</p>
         </div>

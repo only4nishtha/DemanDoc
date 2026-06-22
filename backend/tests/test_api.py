@@ -131,3 +131,12 @@ def test_geo(client):
         assert "revenue" in state
         assert "units" in state
         assert "growth" in state
+
+def test_upload_dataset(client):
+    import io
+    csv_file = io.BytesIO(b"item_id,store_id,wm_yr_wk\nFOODS_1_001,CA_1,11101\n")
+    csv_file.name = "test_upload.csv"
+    response = client.post("/api/upload-dataset", files={"file": ("test_upload.csv", csv_file, "text/csv")})
+    assert response.status_code == 200
+    assert "Successfully ingested" in response.json()["message"]
+

@@ -39,13 +39,15 @@ export default function GeographicInsights() {
   }
 
   const rawData: GeoPoint[] = response.geo || [];
-  const chartData = rawData.map((item) => {
+  // Sort states by revenue for better visualization
+  const sortedData = [...rawData].sort((a, b) => a.revenue - b.revenue);
+
+  const states = sortedData.map((item) => {
     const sign = item.growth >= 0 ? "+" : "";
-    return {
-      name: `${item.state} (${sign}${item.growth.toFixed(1)}%)`,
-      value: item.revenue,
-    };
+    return `${item.state} (${sign}${item.growth.toFixed(1)}% YoY)`;
   });
+  
+  const revenues = sortedData.map((item) => item.revenue);
 
   // Calculate dynamic insights
   let topState = "N/A";
@@ -69,34 +71,39 @@ export default function GeographicInsights() {
   const option = {
     backgroundColor: "transparent",
     tooltip: {
-      trigger: "item",
-      formatter: "{b}: ${c} ({d}%)",
+      trigger: "axis",
+      axisPointer: { type: "shadow" },
+      formatter: "{b}: ${c}",
       backgroundColor: "#1F2937",
       borderWidth: 0,
       textStyle: { color: "#fff" },
     },
-    legend: {
-      orient: "vertical",
-      left: "left",
-      textStyle: { color: "#9CA3AF" },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      top: "5%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "value",
+      axisLine: { lineStyle: { color: "#374151" } },
+      axisLabel: { color: "#9CA3AF" },
+      splitLine: { lineStyle: { color: "#1F2937" } },
+    },
+    yAxis: {
+      type: "category",
+      data: states,
+      axisLine: { lineStyle: { color: "#374151" } },
+      axisLabel: { color: "#9CA3AF" },
     },
     series: [
       {
         name: "Revenue by State",
-        type: "pie",
-        radius: "60%",
-        data: chartData,
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: "rgba(0, 0, 0, 0.5)",
-          },
-        },
-        label: {
-          color: "#9CA3AF",
-        },
-        color: ["#2DD4BF", "#06B6D4", "#3B82F6"],
+        type: "bar",
+        data: revenues,
+        itemStyle: { color: "#2DD4BF" },
+        barWidth: "40%",
       },
     ],
   };
@@ -109,13 +116,13 @@ export default function GeographicInsights() {
       <div className="col-span-12 xl:col-span-4 flex flex-col justify-center space-y-4 bg-[#1E2432]/40 p-4 rounded-xl border border-[#252B38] h-fit">
         <div>
           <h4 className="text-[10px] font-bold text-[#2DD4BF] uppercase tracking-wider mb-1">
-            🌍 Regional Splitting
+            Regional Splitting
           </h4>
           <p className="text-xs text-gray-300 leading-relaxed">{trendText}</p>
         </div>
         <div className="border-t border-[#252B38] pt-3">
           <h4 className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">
-            ⚠️ Local Stagnation
+            Local Stagnation
           </h4>
           <p className="text-xs text-gray-300 leading-relaxed">{concernText}</p>
         </div>

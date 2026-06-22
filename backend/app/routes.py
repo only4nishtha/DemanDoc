@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, UploadFile, File
 from typing import Optional
 import datetime
+import os
 import pandas as pd
-from .database import get_db
+from .database import get_db, BASE_DIR
 from .schemas import (
     HealthResponse, KPIResponse, TrendResponse, TrendPoint,
     TreemapResponse, TreemapCategory, TopProductsResponse, TopProduct,
@@ -510,3 +511,23 @@ def get_geo(
         ))
 
     return {"geo": geo}
+
+@router.post("/upload-dataset")
+async def upload_dataset(file: UploadFile = File(...)):
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Only CSV files are supported.")
+    
+    # Save to data/raw
+    raw_dir = os.path.join(BASE_DIR, "data", "raw")
+    os.makedirs(raw_dir, exist_ok=True)
+    dest_path = os.path.join(raw_dir, file.filename)
+    
+    try:
+        with open(dest_path, "wb") as buffer:
+            while chunk := await file.read(1024 * 1024): # 1MB chunk size
+                buffer.write(chunk)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File write failed: {str(e)}")
+        
+    return {"message": f"Successfully ingested {file.filename}", "path": dest_path}
+
